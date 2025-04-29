@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Borrowing{% endblock %}
+
+{% block body %}
+    <h1>Borrowing</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ borrowing.id }}</td>
+            </tr>
+            <tr>
+                <th>BorrowDate</th>
+                <td>{{ borrowing.borrowDate ? borrowing.borrowDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>ReturnDate</th>
+                <td>{{ borrowing.returnDate ? borrowing.returnDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_borrowing_index') }}">back to list</a>
+
+    <a href="{{ path('app_borrowing_edit', {'id': borrowing.id}) }}">edit</a>
+
+    {{ include('borrowing/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Borrowing{% endblock %}
+
+{% block body %}
+    <h1>Edit Borrowing</h1>
+
+    {{ include('borrowing/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_borrowing_index') }}">back to list</a>
+
+    {{ include('borrowing/_delete_form.html.twig') }}
+{% endblock %}
