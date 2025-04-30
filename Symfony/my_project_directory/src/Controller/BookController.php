@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Form\BookFilterType;
 use App\Form\BookForm;
 use App\Repository\BookRepository;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +16,66 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/book')]
 final class BookController extends AbstractController
 {
-    #[Route(name: 'app_book_index', methods: ['GET'])]
-    public function index(BookRepository $bookRepository): Response
+    #[Route(name: 'app_book_index', methods: ['GET', 'POST'])]
+    public function index(Request $request,
+                          BookRepository $bookRepository,
+                          PaginationService $paginationService): Response
     {
+        $page = $request->get('page', 1);
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+
+        $form = $this->createForm(BookFilterType::class);
+        $form->handleRequest($request);
+        $filters = $form->getData() ?? [];
+
+        $books = $paginationService->paginate(
+            'App\Entity\Book',
+            $filters,
+            $page,
+            $itemsPerPage,
+            function ($queryBuilder, $filters) {
+                if (isset($filters['title']) && $filters['title']) {
+                    $queryBuilder->andWhere('e.title LIKE :title')
+                        ->setParameter('title', '%' . $filters['title'] . '%');
+                }
+                if (isset($filters['publishedYear']) && $filters['publishedYear']) {
+                    $queryBuilder->andWhere('e.publishedYear = :publishedYear')
+                        ->setParameter('publishedYear', $filters['publishedYear']);
+                }
+                if (isset($filters['author']) && $filters['author']) {
+                    $queryBuilder->andWhere('e.author = :author')
+                        ->setParameter('author', $filters['author']);
+                }
+            }
+        );
+
+        $totalBooks = $paginationService->getTotalCount(
+            'App\Entity\Book',
+            $filters,
+            function ($queryBuilder, $filters) {
+                if (isset($filters['title']) && $filters['title']) {
+                    $queryBuilder->andWhere('e.title LIKE :title')
+                        ->setParameter('title', '%' . $filters['title'] . '%');
+                }
+                if (isset($filters['publishedYear']) && $filters['publishedYear']) {
+                    $queryBuilder->andWhere('e.publishedYear = :publishedYear')
+                        ->setParameter('publishedYear', $filters['publishedYear']);
+                }
+                if (isset($filters['author']) && $filters['author']) {
+                    $queryBuilder->andWhere('e.author = :author')
+                        ->setParameter('author', $filters['author']);
+                }
+            }
+        );
+        $totalPages = ceil($totalBooks / $itemsPerPage);
+
         return $this->render('book/index.html.twig', [
-            'books' => $bookRepository->findAll(),
+            'books' => $books,
+            'form' => $form->createView(),
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'itemsPerPage' => $itemsPerPage,
+            'totalBooks' => $totalBooks,
         ]);
     }
 

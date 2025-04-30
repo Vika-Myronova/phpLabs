@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Form\CategoryFilterType;
 use App\Form\CategoryForm;
 use App\Repository\CategoryRepository;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +16,49 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/category')]
 final class CategoryController extends AbstractController
 {
-    #[Route(name: 'app_category_index', methods: ['GET'])]
-    public function index(CategoryRepository $categoryRepository): Response
+    #[Route(name: 'app_category_index', methods: ['GET', 'POST'])]
+    public function index(Request $request, PaginationService $paginationService): Response
     {
+        $page = $request->get('page', 1);
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+
+        // Форма фільтрації
+        $form = $this->createForm(CategoryFilterType::class);
+        $form->handleRequest($request);
+        $filterData = $form->getData() ?? [];
+
+        $categories = $paginationService->paginate(
+            'App\Entity\Category',
+            $filterData,  // Передаємо фільтри
+            $page,
+            $itemsPerPage,
+            function ($queryBuilder, $filterData) {
+                // Додаємо фільтри, якщо вони є
+                if (isset($filterData['name']) && $filterData['name']) {
+                    $queryBuilder->andWhere('e.name LIKE :name')
+                        ->setParameter('name', '%' . $filterData['name'] . '%');
+                }
+            }
+        );
+        $totalCategories = $paginationService->getTotalCount(
+            'App\Entity\Category',
+            $filterData,
+            function ($queryBuilder, $filterData) {
+                if (isset($filterData['name']) && $filterData['name']) {
+                    $queryBuilder->andWhere('e.name LIKE :name')
+                        ->setParameter('name', '%' . $filterData['name'] . '%');
+                }
+            }
+        );
+        $totalPages = ceil($totalCategories / $itemsPerPage);
+
         return $this->render('category/index.html.twig', [
-            'categories' => $categoryRepository->findAll(),
+            'categories' => $categories,
+            'form' => $form->createView(),
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'itemsPerPage' => $itemsPerPage,
+            'totalCategories' => $totalCategories,
         ]);
     }
 

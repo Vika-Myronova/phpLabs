@@ -5,10 +5,21 @@
 {% block body %}
     <h1>Borrowing index</h1>
 
+    {{ form_start(form) }}
+    {{ form_row(form.borrowDateFrom) }}
+    {{ form_row(form.borrowDateTo) }}
+    {{ form_row(form.returnDateFrom) }}
+    {{ form_row(form.returnDateTo) }}
+    {{ form_row(form.book) }}
+    {{ form_row(form.reader) }}
+    <button class="btn btn-primary">Фільтрувати</button>
+    {{ form_end(form) }}
+
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Book</th>
                 <th>BorrowDate</th>
                 <th>ReturnDate</th>
                 <th>actions</th>
@@ -18,6 +29,7 @@
         {% for borrowing in borrowings %}
             <tr>
                 <td>{{ borrowing.id }}</td>
+                <td>{{ borrowing.book.title }}</td>
                 <td>{{ borrowing.borrowDate ? borrowing.borrowDate|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ borrowing.returnDate ? borrowing.returnDate|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
@@ -34,4 +46,23 @@
     </table>
 
     <a href="{{ path('app_borrowing_new') }}">Create new</a>
+
+    <div class="pagination">
+        {% if currentPage > 1 %}
+            <a href="{{ path('app_borrowing_index', { page: currentPage - 1, itemsPerPage: itemsPerPage }) }}">Previous</a>
+        {% endif %}
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        {% if currentPage < totalPages %}
+            <a href="{{ path('app_borrowing_index', { page: currentPage + 1, itemsPerPage: itemsPerPage }) }}">Next</a>
+        {% endif %}
+    </div>
+
+    <form method="get">
+        <label for="itemsPerPage">Items per page:</label>
+        <select name="itemsPerPage" onchange="this.form.submit()">
+            <option value="2" {% if itemsPerPage == 2 %}selected{% endif %}>2</option>
+            <option value="5" {% if itemsPerPage == 5 %}selected{% endif %}>5</option>
+            <option value="10" {% if itemsPerPage == 10 %}selected{% endif %}>10</option>
+        </select>
+    </form>
 {% endblock %}

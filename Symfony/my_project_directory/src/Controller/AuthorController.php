@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Author;
+use App\Form\AuthorFilterType;
 use App\Form\AuthorForm;
 use App\Repository\AuthorRepository;
+use App\Service\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,11 +16,60 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/author')]
 final class AuthorController extends AbstractController
 {
-    #[Route(name: 'app_author_index', methods: ['GET'])]
-    public function index(AuthorRepository $authorRepository): Response
+    #[Route(name: 'app_author_index', methods: ['GET', 'POST'])]
+    public function index(Request $request,
+                          AuthorRepository $authorRepository,
+                          PaginationService $paginationService): Response
     {
+        $page = $request->get('page', 1);
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+
+        // Форма фільтрації
+        $form = $this->createForm(AuthorFilterType::class);
+        $form->handleRequest($request);
+        $filters = $form->getData() ?? [];
+
+        $authors = $paginationService->paginate(
+            'App\Entity\Author',
+            $filters,
+            $page,
+            $itemsPerPage,
+            function ($queryBuilder, $filters) {
+                if (isset($filters['name']) && $filters['name']) {
+                    $queryBuilder->andWhere('e.name LIKE :name')
+                        ->setParameter('name', '%' . $filters['name'] . '%');
+                }
+                if (isset($filters['birth_year']) && $filters['birth_year']) {
+                    $queryBuilder->andWhere('e.birthYear = :birth_year')
+                        ->setParameter('birth_year', $filters['birth_year']);
+                }
+            }
+        );
+
+        $totalAuthors = $paginationService->getTotalCount(
+            'App\Entity\Author',
+            $filters,
+            function ($queryBuilder, $filters) {
+                if (isset($filters['name']) && $filters['name']) {
+                    $queryBuilder->andWhere('e.name LIKE :name')
+                        ->setParameter('name', '%' . $filters['name'] . '%');
+                }
+                if (isset($filters['birth_year']) && $filters['birth_year']) {
+                    $queryBuilder->andWhere('e.birthYear = :birth_year')
+                        ->setParameter('birth_year', $filters['birth_year']);
+                }
+            }
+        );
+
+        $totalPages = ceil($totalAuthors / $itemsPerPage);
+
         return $this->render('author/index.html.twig', [
-            'authors' => $authorRepository->findAll(),
+            'authors' => $authors,
+            'form' => $form->createView(),
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'itemsPerPage' => $itemsPerPage,
+            'totalAuthors' => $totalAuthors,
         ]);
     }
 

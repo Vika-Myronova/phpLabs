@@ -5,6 +5,10 @@
 {% block body %}
     <h1>Category index</h1>
 
+    {{ form_start(form) }}
+    {{ form_row(form.name) }}
+    {{ form_end(form) }}
+
     <table class="table">
         <thead>
             <tr>
@@ -30,6 +34,22 @@
         {% endfor %}
         </tbody>
     </table>
-
     <a href="{{ path('app_category_new') }}">Create new</a>
+    <div>
+        <ul class="pagination">
+            <li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ path('app_category_index', { page: 1, itemsPerPage: itemsPerPage }) }}">First</a>
+            </li>
+            <li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ path('app_category_index', { page: currentPage - 1, itemsPerPage: itemsPerPage }) }}">Previous</a>
+            </li>
+            <li class="page-item {% if currentPage == totalPages %}disabled{% endif %}">
+                <a class="page-link" href="{{ path('app_category_index', { page: currentPage + 1, itemsPerPage: itemsPerPage }) }}">Next</a>
+            </li>
+            <li class="page-item {% if currentPage == totalPages %}disabled{% endif %}">
+                <a class="page-link" href="{{ path('app_category_index', { page: totalPages, itemsPerPage: itemsPerPage }) }}">Last</a>
+            </li>
+        </ul>
+    </div>
+
 {% endblock %}

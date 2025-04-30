@@ -16,6 +16,18 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
+    public function findByFilters($filterData)
+    {
+        $queryBuilder = $this->createQueryBuilder('c');
+
+        if ($filterData && isset($filterData['name']) && $filterData['name']) {
+            $queryBuilder->andWhere('c.name LIKE :name')
+                ->setParameter('name', '%' . $filterData['name'] . '%');
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Category[] Returns an array of Category objects
     //     */

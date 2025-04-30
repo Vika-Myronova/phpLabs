@@ -16,6 +16,23 @@ class AuthorRepository extends ServiceEntityRepository
         parent::__construct($registry, Author::class);
     }
 
+    public function findByFilters(?string $name, ?float $birthYear): array
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        if ($name) {
+            $qb->andWhere('a.name LIKE :name')
+                ->setParameter('name', '%' . $name . '%');
+        }
+
+        if ($birthYear) {
+            $qb->andWhere('a.birth_year = :birthYear')
+                ->setParameter('birthYear', $birthYear);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Author[] Returns an array of Author objects
     //     */

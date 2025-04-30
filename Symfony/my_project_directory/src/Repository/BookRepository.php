@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +15,28 @@ class BookRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Book::class);
+    }
+
+    public function findByFilters(?string $title, ?int $publishedYear, ?Author $author): array
+    {
+        $qb = $this->createQueryBuilder('b');
+
+        if ($title) {
+            $qb->andWhere('b.title LIKE :title')
+                ->setParameter('title', '%' . $title . '%');
+        }
+
+        if ($publishedYear) {
+            $qb->andWhere('b.publishedYear = :year')
+                ->setParameter('year', $publishedYear);
+        }
+
+        if ($author) {
+            $qb->andWhere('b.author = :author')
+                ->setParameter('author', $author);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**
