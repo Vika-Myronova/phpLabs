@@ -9,18 +9,22 @@ use Illuminate\Http\Request;
 
 class BorrowingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function index(Request $request)
     {
-        $borrowings = Borrowing::all();
-        return view('borrowings.index', compact('borrowings'));
+        $filters = $request->only(['borrow_date', 'return_date', 'book_id', 'reader_id']);
+
+        $borrowings = Borrowing::with(['book', 'reader'])
+            ->filter($filters)
+            ->get();
+
+        $books = Book::all();
+        $readers = Reader::all();
+
+        return view('borrowings.index', compact('borrowings', 'books', 'readers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $books = Book::all();
@@ -28,9 +32,7 @@ class BorrowingController extends Controller
         return view('borrowings.create', compact('books', 'readers'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -50,18 +52,13 @@ class BorrowingController extends Controller
         return redirect()->route('borrowings.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         $borrowing = Borrowing::with(['book', 'reader'])->findOrFail($id);
         return view('borrowings.show', compact('borrowing'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Borrowing $borrowing)
     {
         $books = Book::all();
@@ -69,9 +66,6 @@ class BorrowingController extends Controller
         return view('borrowings.edit', compact('borrowing', 'books', 'readers'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -91,9 +85,6 @@ class BorrowingController extends Controller
         return redirect()->route('borrowings.index')->with('success', 'Borrowing updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Borrowing $borrowing)
     {
         $borrowing->delete();

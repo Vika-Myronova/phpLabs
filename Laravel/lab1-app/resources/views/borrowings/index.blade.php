@@ -3,6 +3,42 @@
 @section('content')
     <h1>Borrowings</h1>
     <a href="{{ route('borrowings.create') }}">Create New Borrowing</a>
+    <form method="GET" action="{{ route('borrowings.index') }}" class="mb-4">
+        <div class="row">
+            <div class="col">
+                <input type="date" name="borrow_date" class="form-control" placeholder="Borrow Date"
+                       value="{{ request('borrow_date') }}">
+            </div>
+            <div class="col">
+                <input type="date" name="return_date" class="form-control" placeholder="Return Date"
+                       value="{{ request('return_date') }}">
+            </div>
+            <div class="col">
+                <select name="book_id" class="form-control">
+                    <option value="">All Books</option>
+                    @foreach($books as $book)
+                        <option value="{{ $book->id }}" {{ request('book_id') == $book->id ? 'selected' : '' }}>
+                            {{ $book->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col">
+                <select name="reader_id" class="form-control">
+                    <option value="">All Readers</option>
+                    @foreach($readers as $reader)
+                        <option value="{{ $reader->id }}" {{ request('reader_id') == $reader->id ? 'selected' : '' }}>
+                            {{ $reader->full_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+
     <table>
         <thead>
         <tr>

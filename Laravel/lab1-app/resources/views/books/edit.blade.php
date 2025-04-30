@@ -31,8 +31,8 @@
 
             <div class="mb-3">
                 <label for="publishedYear" class="form-label">Published Year</label>
-                <input type="number" class="form-control" id="publishedYear" name="publishedYear" value="{{ old('publishedYear', $book->publishedYear) }}">
-                @error('publishedYear')
+                <input type="number" class="form-control" id="published_year" name="published_year" value="{{ old('published_year', $book->published_year) }}">
+                @error('published_year')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>

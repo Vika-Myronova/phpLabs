@@ -4,6 +4,22 @@
     <div class="container">
         <h1>Books</h1>
         <a href="{{ route('books.create') }}" class="btn btn-primary mb-3">Add New Book</a>
+        <form method="GET" action="{{ route('books.index') }}" class="mb-3">
+            <input type="text" name="title" value="{{ request('title') }}" placeholder="Title">
+            <input type="text" name="published_year" value="{{ request('published_year') }}" placeholder="Published Year">
+            <input type="text" name="isbn" value="{{ request('isbn') }}" placeholder="ISBN">
+
+            <select name="author_id">
+                <option value="">-- Select Author --</option>
+                @foreach($books as $book)
+                    <option value="{{ $book->author->id }}" {{ request('author_id') == $book->author->id ? 'selected' : '' }}>
+                        {{ $book->author->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            <button type="submit">Filter</button>
+        </form>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -25,7 +41,7 @@
                 <tr>
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author->name }}</td>
-                    <td>{{ $book->publishedYear }}</td>
+                    <td>{{ $book->published_year }}</td>
                     <td>{{ $book->isbn }}</td>
                     <td>
                         @foreach($book->categories as $category)

@@ -5,6 +5,18 @@
         <h1>Categories</h1>
         <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Add New Category</a>
 
+        <form method="GET" action="{{ route('categories.index') }}" class="mb-3">
+            <div class="row">
+                <div class="col">
+                    <input type="text" name="name" class="form-control" placeholder="Category Name"
+                           value="{{ request('name') }}">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif

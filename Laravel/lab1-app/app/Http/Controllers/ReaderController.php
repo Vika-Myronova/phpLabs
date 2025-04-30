@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 class ReaderController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $readers = Reader::all();
+        $filters = $request->only(['full_name', 'email']);
+        $readers = Reader::filter($filters)->get();
+
         return view('readers.index', compact('readers'));
     }
 

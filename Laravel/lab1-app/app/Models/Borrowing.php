@@ -33,4 +33,25 @@ class Borrowing extends Model
         return $this->belongsTo(Reader::class);
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['borrow_date'])) {
+            $query->whereDate('borrow_date', $filters['borrow_date']);
+        }
+
+        if (!empty($filters['return_date'])) {
+            $query->whereDate('return_date', $filters['return_date']);
+        }
+
+        if (!empty($filters['book_id'])) {
+            $query->where('book_id', $filters['book_id']);
+        }
+
+        if (!empty($filters['reader_id'])) {
+            $query->where('reader_id', $filters['reader_id']);
+        }
+
+        return $query;
+    }
+
 }

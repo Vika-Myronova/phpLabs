@@ -19,4 +19,13 @@ class Category extends Model
     {
         return $this->belongsToMany(Book::class, 'book_category', 'category_id', 'book_id');
     }
+
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['name'])) {
+            $query->where('name', 'like', '%' . $filters['name'] . '%');
+        }
+
+        return $query;
+    }
 }

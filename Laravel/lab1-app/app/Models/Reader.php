@@ -18,4 +18,15 @@ class Reader extends Model
     {
         return $this->hasMany(Borrowing::class);
     }
+
+    public function scopeFilter($query, array $filters)
+    {
+        if (!empty($filters['full_name'])) {
+            $query->where('full_name', 'like', '%' . $filters['full_name'] . '%');
+        }
+
+        if (!empty($filters['email'])) {
+            $query->where('email', 'like', '%' . $filters['email'] . '%');
+        }
+    }
 }
