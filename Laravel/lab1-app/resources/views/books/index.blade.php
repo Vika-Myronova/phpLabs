@@ -17,13 +17,15 @@
                     </option>
                 @endforeach
             </select>
-
+            <div class="col">
+                <select name="itemsPerPage" class="form-control" onchange="this.form.submit()">
+                    <option value="2" {{ request('itemsPerPage') == '2' ? 'selected' : '' }}>2</option>
+                    <option value="3" {{ request('itemsPerPage') == '3' ? 'selected' : '' }}>3</option>
+                    <option value="10" {{ request('itemsPerPage') == '10' ? 'selected' : '' }}>10</option>
+                </select>
+            </div>
             <button type="submit">Filter</button>
         </form>
-
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
 
         <table class="table table-bordered">
             <thead>
@@ -61,5 +63,9 @@
             @endforeach
             </tbody>
         </table>
+
+    </div>
+    <div class="d-flex justify-content-center">
+        {{ $books->links('pagination::simple-bootstrap-4') }}
     </div>
 @endsection

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 
-class Category extends Model
+class Category extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'category';

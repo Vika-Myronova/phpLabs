@@ -11,7 +11,8 @@ class ReaderController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['full_name', 'email']);
-        $readers = Reader::filter($filters)->get();
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+        $readers = Reader::filter($filters)->paginate($itemsPerPage);
 
         return view('readers.index', compact('readers'));
     }

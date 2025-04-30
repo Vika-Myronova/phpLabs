@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Reader extends Model
+class Reader extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'reader';

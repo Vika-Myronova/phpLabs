@@ -11,7 +11,9 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['name']);
-        $categories = Category::filter($filters)->get();
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+        $categories = Category::filter($filters)->paginate($itemsPerPage);
+
         return view('categories.index', compact('categories'));
     }
 

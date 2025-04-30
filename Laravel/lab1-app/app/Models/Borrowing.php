@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
-class Borrowing extends Model
+class Borrowing extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'borrowing';

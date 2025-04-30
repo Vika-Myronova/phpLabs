@@ -8,6 +8,15 @@
         <form method="GET" action="{{ route('readers.index') }}" class="mb-3">
             <input type="text" name="full_name" value="{{ request('full_name') }}" placeholder="Full Name">
             <input type="email" name="email" value="{{ request('email') }}" placeholder="Email">
+
+            <div class="col">
+                <select name="itemsPerPage" class="form-control" onchange="this.form.submit()">
+                    <option value="2" {{ request('itemsPerPage') == '2' ? 'selected' : '' }}>2</option>
+                    <option value="5" {{ request('itemsPerPage') == '5' ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ request('itemsPerPage') == '10' ? 'selected' : '' }}>10</option>
+                </select>
+            </div>
+
             <button type="submit">Filter</button>
         </form>
 
@@ -41,6 +50,8 @@
             @endforeach
             </tbody>
         </table>
-
+        <div class="d-flex justify-content-center">
+            {{ $readers->links('pagination::simple-bootstrap-4') }}
+        </div>
     </div>
 @endsection

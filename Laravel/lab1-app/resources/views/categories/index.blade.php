@@ -6,15 +6,17 @@
         <a href="{{ route('categories.create') }}" class="btn btn-primary mb-3">Add New Category</a>
 
         <form method="GET" action="{{ route('categories.index') }}" class="mb-3">
-            <div class="row">
-                <div class="col">
-                    <input type="text" name="name" class="form-control" placeholder="Category Name"
-                           value="{{ request('name') }}">
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
+            <input type="text" name="name" value="{{ request('name') }}" placeholder="Category Name">
+
+            <div class="col">
+                <select name="itemsPerPage" class="form-control" onchange="this.form.submit()">
+                    <option value="2" {{ request('itemsPerPage') == '2' ? 'selected' : '' }}>2</option>
+                    <option value="5" {{ request('itemsPerPage') == '5' ? 'selected' : '' }}>5</option>
+                    <option value="10" {{ request('itemsPerPage') == '10' ? 'selected' : '' }}>10</option>
+                </select>
             </div>
+
+            <button type="submit">Filter</button>
         </form>
 
         @if(session('success'))
@@ -45,5 +47,8 @@
             @endforeach
             </tbody>
         </table>
+        <div class="d-flex justify-content-center">
+            {{ $categories->links('pagination::simple-bootstrap-4') }}
+        </div>
     </div>
 @endsection

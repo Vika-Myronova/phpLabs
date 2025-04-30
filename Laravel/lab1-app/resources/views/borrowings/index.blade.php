@@ -3,40 +3,37 @@
 @section('content')
     <h1>Borrowings</h1>
     <a href="{{ route('borrowings.create') }}">Create New Borrowing</a>
-    <form method="GET" action="{{ route('borrowings.index') }}" class="mb-4">
-        <div class="row">
-            <div class="col">
-                <input type="date" name="borrow_date" class="form-control" placeholder="Borrow Date"
-                       value="{{ request('borrow_date') }}">
-            </div>
-            <div class="col">
-                <input type="date" name="return_date" class="form-control" placeholder="Return Date"
-                       value="{{ request('return_date') }}">
-            </div>
-            <div class="col">
-                <select name="book_id" class="form-control">
-                    <option value="">All Books</option>
-                    @foreach($books as $book)
-                        <option value="{{ $book->id }}" {{ request('book_id') == $book->id ? 'selected' : '' }}>
-                            {{ $book->title }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col">
-                <select name="reader_id" class="form-control">
-                    <option value="">All Readers</option>
-                    @foreach($readers as $reader)
-                        <option value="{{ $reader->id }}" {{ request('reader_id') == $reader->id ? 'selected' : '' }}>
-                            {{ $reader->full_name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col">
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </div>
+    <form method="GET" action="{{ route('borrowings.index') }}" class="mb-3">
+        <input type="date" name="borrow_date" value="{{ request('borrow_date') }}" placeholder="Borrow Date">
+        <input type="date" name="return_date" value="{{ request('return_date') }}" placeholder="Return Date">
+
+        <select name="book_id">
+            <option value="">-- Select Book --</option>
+            @foreach($books as $book)
+                <option value="{{ $book->id }}" {{ request('book_id') == $book->id ? 'selected' : '' }}>
+                    {{ $book->title }}
+                </option>
+            @endforeach
+        </select>
+
+        <select name="reader_id">
+            <option value="">-- Select Reader --</option>
+            @foreach($readers as $reader)
+                <option value="{{ $reader->id }}" {{ request('reader_id') == $reader->id ? 'selected' : '' }}>
+                    {{ $reader->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <div class="col">
+            <select name="itemsPerPage" class="form-control" onchange="this.form.submit()">
+                <option value="2" {{ request('itemsPerPage') == '2' ? 'selected' : '' }}>2</option>
+                <option value="5" {{ request('itemsPerPage') == '5' ? 'selected' : '' }}>5</option>
+                <option value="10" {{ request('itemsPerPage') == '10' ? 'selected' : '' }}>10</option>
+            </select>
         </div>
+
+        <button type="submit">Filter</button>
     </form>
 
     <table>
@@ -69,4 +66,7 @@
         @endforeach
         </tbody>
     </table>
+    <div class="d-flex justify-content-center">
+        {{ $borrowings->links('pagination::simple-bootstrap-4') }}
+    </div>
 @endsection

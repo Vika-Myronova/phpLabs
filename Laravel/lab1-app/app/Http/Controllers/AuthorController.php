@@ -9,9 +9,12 @@ use App\Models\Author;
 class AuthorController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $authors = Author::all();
+        $filters = $request->only(['name', 'birth_year']);
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+
+        $authors = Author::filter($filters)->paginate($itemsPerPage);
         return view('authors.index', compact('authors'));
     }
 

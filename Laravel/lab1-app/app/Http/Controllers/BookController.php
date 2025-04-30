@@ -13,7 +13,9 @@ class BookController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['title', 'published_year', 'isbn', 'author_id']);
-        $books = Book::with('author')->filter($filters)->get();
+        $itemsPerPage = $request->get('itemsPerPage', 2);
+
+        $books = Book::paginateWithFilters($filters, $itemsPerPage);
         $authors = Author::all();
 
         return view('books.index', compact('books', 'authors'));

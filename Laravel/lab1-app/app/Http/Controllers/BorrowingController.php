@@ -13,13 +13,11 @@ class BorrowingController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['borrow_date', 'return_date', 'book_id', 'reader_id']);
+        $itemsPerPage = $request->get('itemsPerPage', 10);
+        $borrowings = Borrowing::filter($filters)->paginate($itemsPerPage);
 
-        $borrowings = Borrowing::with(['book', 'reader'])
-            ->filter($filters)
-            ->get();
-
-        $books = Book::all();
-        $readers = Reader::all();
+        $books = Book::select('id', 'title')->get();
+        $readers = Reader::select('id', 'full_name')->get();
 
         return view('borrowings.index', compact('borrowings', 'books', 'readers'));
     }
