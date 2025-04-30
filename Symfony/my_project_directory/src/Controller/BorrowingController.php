@@ -11,13 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/borrowing')]
+#[Route('/borrowings')]
 final class BorrowingController extends AbstractController
 {
     #[Route(name: 'app_borrowing_index', methods: ['GET'])]
     public function index(BorrowingRepository $borrowingRepository): Response
     {
-        return $this->render('borrowing/index.html.twig', [
+        return $this->render('borrowings/index.html.twig', [
             'borrowings' => $borrowingRepository->findAll(),
         ]);
     }
@@ -36,8 +36,8 @@ final class BorrowingController extends AbstractController
             return $this->redirectToRoute('app_borrowing_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('borrowing/new.html.twig', [
-            'borrowing' => $borrowing,
+        return $this->render('borrowings/new.html.twig', [
+            'borrowings' => $borrowing,
             'form' => $form,
         ]);
     }
@@ -45,8 +45,8 @@ final class BorrowingController extends AbstractController
     #[Route('/{id}', name: 'app_borrowing_show', methods: ['GET'])]
     public function show(Borrowing $borrowing): Response
     {
-        return $this->render('borrowing/show.html.twig', [
-            'borrowing' => $borrowing,
+        return $this->render('borrowings/show.html.twig', [
+            'borrowings' => $borrowing,
         ]);
     }
 
@@ -62,8 +62,8 @@ final class BorrowingController extends AbstractController
             return $this->redirectToRoute('app_borrowing_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('borrowing/edit.html.twig', [
-            'borrowing' => $borrowing,
+        return $this->render('borrowings/edit.html.twig', [
+            'borrowings' => $borrowing,
             'form' => $form,
         ]);
     }
