@@ -21,6 +21,10 @@ final class BorrowingController extends AbstractController
                           BorrowingRepository $borrowingRepository,
                           PaginationService $paginationService): Response
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $page = $request->get('page', 1);
         $itemsPerPage = $request->get('itemsPerPage', 2);
 
@@ -82,6 +86,11 @@ final class BorrowingController extends AbstractController
     #[Route('/new', name: 'app_borrowing_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $borrowing = new Borrowing();
         $form = $this->createForm(BorrowingForm::class, $borrowing);
         $form->handleRequest($request);
@@ -102,6 +111,10 @@ final class BorrowingController extends AbstractController
     #[Route('/{id}', name: 'app_borrowing_show', methods: ['GET'])]
     public function show(Borrowing $borrowing): Response
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->render('borrowings/show.html.twig', [
             'borrowings' => $borrowing,
         ]);
@@ -110,6 +123,11 @@ final class BorrowingController extends AbstractController
     #[Route('/{id}/edit', name: 'app_borrowing_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Borrowing $borrowing, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(BorrowingForm::class, $borrowing);
         $form->handleRequest($request);
 
@@ -128,6 +146,10 @@ final class BorrowingController extends AbstractController
     #[Route('/{id}', name: 'app_borrowing_delete', methods: ['POST'])]
     public function delete(Request $request, Borrowing $borrowing, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN'))
+        {
+            throw $this->createAccessDeniedException();
+        }
         if ($this->isCsrfTokenValid('delete'.$borrowing->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($borrowing);
             $entityManager->flush();

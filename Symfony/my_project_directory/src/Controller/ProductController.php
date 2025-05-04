@@ -26,6 +26,10 @@ class ProductController extends AbstractController
     #[Route('/products', name: 'get_products', methods: [Request::METHOD_GET])]
     public function getProducts(): JsonResponse
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         return new JsonResponse(['data' => self::PRODUCTS], Response::HTTP_OK);
     }
 
@@ -36,6 +40,10 @@ class ProductController extends AbstractController
     #[Route('/products/{id}', name: 'get_product_item', methods: [Request::METHOD_GET])]
     public function getProductItem(string $id): JsonResponse
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $product = $this->getProductItemById(self::PRODUCTS, $id);
 
         if (!$product) {
@@ -52,6 +60,11 @@ class ProductController extends AbstractController
     #[Route('/products', name: 'post_products', methods: [Request::METHOD_POST])]
     public function createProduct(Request $request): JsonResponse
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $requestData = json_decode($request->getContent(), true);
 
         $productId = random_int(100, 999);
@@ -76,6 +89,11 @@ class ProductController extends AbstractController
     #[Route('/products/{id}', name: 'put_product', methods: [Request::METHOD_PUT])]
     public function updateProduct(string $id, Request $request): JsonResponse
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $product = $this->getProductItemById(self::PRODUCTS, $id);
 
         if (!$product) {
@@ -103,6 +121,9 @@ class ProductController extends AbstractController
     #[Route('/products/{id}', name: 'delete_product', methods: [Request::METHOD_DELETE])]
     public function deleteProduct(string $id): JsonResponse
     {
+        if (!$this->isGranted('ROLE_ADMIN')){
+            throw $this->createAccessDeniedException();
+        }
         $product = $this->getProductItemById(self::PRODUCTS, $id);
 
         if (!$product) {

@@ -22,6 +22,10 @@ final class ReaderController extends AbstractController
         ReaderRepository $readerRepository,
         PaginationService $paginationService
     ): Response {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         // Параметри пагінації
         $page = $request->get('page', 1);  // За замовчуванням сторінка 1
         $itemsPerPage = $request->get('itemsPerPage', 10);  // За замовчуванням 10 елементів на сторінці
@@ -89,6 +93,11 @@ final class ReaderController extends AbstractController
     #[Route('/new', name: 'app_reader_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $reader = new Reader();
         $form = $this->createForm(ReaderForm::class, $reader);
         $form->handleRequest($request);
@@ -109,6 +118,10 @@ final class ReaderController extends AbstractController
     #[Route('/{id}', name: 'app_reader_show', methods: ['GET'])]
     public function show(Reader $reader): Response
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         return $this->render('reader/show.html.twig', [
             'reader' => $reader,
         ]);
@@ -117,6 +130,10 @@ final class ReaderController extends AbstractController
     #[Route('/{id}/edit', name: 'app_reader_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Reader $reader, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
         $form = $this->createForm(ReaderForm::class, $reader);
         $form->handleRequest($request);
 
@@ -135,6 +152,9 @@ final class ReaderController extends AbstractController
     #[Route('/{id}', name: 'app_reader_delete', methods: ['POST'])]
     public function delete(Request $request, Reader $reader, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
         if ($this->isCsrfTokenValid('delete'.$reader->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($reader);
             $entityManager->flush();

@@ -21,6 +21,10 @@ final class BookController extends AbstractController
                           BookRepository $bookRepository,
                           PaginationService $paginationService): Response
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $page = $request->get('page', 1);
         $itemsPerPage = $request->get('itemsPerPage', 2);
 
@@ -82,6 +86,11 @@ final class BookController extends AbstractController
     #[Route('/new', name: 'app_book_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $book = new Book();
         $form = $this->createForm(BookForm::class, $book);
         $form->handleRequest($request);
@@ -102,6 +111,13 @@ final class BookController extends AbstractController
     #[Route('/{id}', name: 'app_book_show', methods: ['GET'])]
     public function show(Book $book): Response
     {
+        if (!$this->isGranted('ROLE_USER')) {
+            throw $this->createAccessDeniedException();
+        }
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
         return $this->render('book/show.html.twig', [
             'book' => $book,
         ]);
@@ -110,6 +126,11 @@ final class BookController extends AbstractController
     #[Route('/{id}/edit', name: 'app_book_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_MANAGER')) {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(BookForm::class, $book);
         $form->handleRequest($request);
 
@@ -128,6 +149,11 @@ final class BookController extends AbstractController
     #[Route('/{id}', name: 'app_book_delete', methods: ['POST'])]
     public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN'))
+        {
+            throw $this->createAccessDeniedException();
+        }
+
         if ($this->isCsrfTokenValid('delete'.$book->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($book);
             $entityManager->flush();
