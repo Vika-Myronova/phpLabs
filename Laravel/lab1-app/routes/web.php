@@ -21,11 +21,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 //Route::get('/test', [TestController::class, 'test']);
 
-Route::get('products', [ProductController::class, 'index']);
-Route::get('products/{id}', [ProductController::class, 'show']);
-Route::post('products', [ProductController::class, 'store']);
-Route::put('products/{id}', [ProductController::class, 'update']);
-Route::delete('products/{id}', [ProductController::class, 'destroy']);
+Route::middleware('auth:api')->group(function () {
+    Route::get('products', [ProductController::class, 'index'])->middleware('role:ROLE_CLIENT');
+
+    Route::get('products/{id}', [ProductController::class, 'show'])->middleware('role:ROLE_CLIENT');
+
+    Route::post('products', [ProductController::class, 'store'])->middleware('role:ROLE_ADMIN,ROLE_MANAGER');
+
+    Route::put('products/{id}', [ProductController::class, 'update'])->middleware('role:ROLE_ADMIN,ROLE_MANAGER');
+
+    Route::delete('products/{id}', [ProductController::class, 'destroy'])->middleware('role:ROLE_ADMIN');
+});
 
 Route::resource('authors', AuthorController::class);
 Route::resource('books', BookController::class);

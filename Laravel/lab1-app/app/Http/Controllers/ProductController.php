@@ -7,6 +7,14 @@ use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+
+        $this->middleware('role:ROLE_ADMIN,ROLE_MANAGER')->only(['store', 'create', 'edit', 'update', 'destroy']);
+        $this->middleware('role:ROLE_CLIENT')->only(['index', 'show']);
+    }
+
     private const PRODUCTS = [
         1 => ['id' => 1, 'name' => 'Laptop', 'description' => 'Gaming Laptop', 'price' => 1000],
         2 => ['id' => 2, 'name' => 'Phone', 'description' => 'Smartphone', 'price' => 500],

@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class BorrowingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+
+        $this->middleware('role:ROLE_ADMIN,ROLE_MANAGER')->only(['store', 'create', 'edit', 'update', 'destroy']);
+        $this->middleware('role:ROLE_CLIENT')->only(['index', 'show']);
+    }
 
     public function index(Request $request)
     {
